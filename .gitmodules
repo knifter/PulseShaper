@@ -1,0 +1,6 @@
+[submodule "FW/pulseshaper/lib/lib-soogh"]
+	path = FW/pulseshaper/lib/lib-soogh
+	url = https://github.com/knifter/lib-soogh
+[submodule "FW/pulseshaper/lib/lib-tools"]
+	path = FW/pulseshaper/lib/lib-tools
+	url = https://github.com/knifter/lib-tools
