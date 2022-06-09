@@ -20,6 +20,7 @@ class MainScreen : public Screen
 		virtual bool handle(soogh_event_t);
 	
 	private:
+        lv_obj_t* lbl_len;
 };
 
 #endif // __SCREENS_MAIN_H

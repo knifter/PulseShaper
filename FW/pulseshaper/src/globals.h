@@ -8,4 +8,6 @@ extern settings_t settings;
 extern SettingsManager setman;
 extern GUI gui;
 
+extern volatile uint32_t pulselen;
+
 #endif //__GLOBALS_H
