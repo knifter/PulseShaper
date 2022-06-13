@@ -17,13 +17,19 @@
 MainScreen::MainScreen(SooghGUI& g) : Screen(g)
 {
     lbl_len = lv_label_create(_screen);
-    lv_obj_set_size(lbl_len, LV_PCT(100), 50);
-	lv_obj_center(lbl_len);
-    lv_obj_set_style_text_align(lbl_len, LV_TEXT_ALIGN_CENTER, 0);
+    lv_obj_set_size(lbl_len, LV_PCT(100), 20);
+	lv_obj_align(lbl_len, LV_ALIGN_TOP_LEFT, 5, 5);
+    lv_obj_set_style_text_align(lbl_len, LV_TEXT_ALIGN_LEFT, 0);
+
+    lbl_enable = lv_label_create(_screen);
+    lv_obj_set_size(lbl_len, LV_PCT(100), 20);
+    lv_obj_align_to(lbl_enable, lbl_len, LV_ALIGN_OUT_BOTTOM_LEFT, 0, 0);
+    lv_obj_set_style_text_align(lbl_enable, LV_TEXT_ALIGN_LEFT, 0);
 };
 
 void MainScreen::loop()
 {
+    lv_label_set_text_fmt(lbl_enable, "Shortened: %s", enabled ? "YES" : "NO");
     return;
 };
 

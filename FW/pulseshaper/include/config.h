@@ -21,9 +21,10 @@
 #endif
 
 #define BOOTSCREEN_TIMEOUT_MS   2000
-#define PULSELEN_MIN            20
+#define PULSELEN_MIN            35
 #define PULSELEN_MAX            4000
-#define PULSELEN_CORRECTION     2           
+#define PULSELEN_DEFAULT        160
+#define PULSELEN_CORRECTION     4          // subtracted from pulselen to correct for context-switching
 
 // PINS M5CORE2
 // #define PIN_SCLK				GPIO_NUM_18
@@ -56,6 +57,8 @@
 
 #define PIN_TRIGGER             GPIO_NUM_15
 #define PIN_PORTAND             GPIO_NUM_13
+#define PIN_ENABLE              GPIO_NUM_34
+
 
 #endif // __CONFIG_H
 

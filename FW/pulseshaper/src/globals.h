@@ -8,6 +8,16 @@ extern settings_t settings;
 extern SettingsManager setman;
 extern GUI gui;
 
-extern volatile uint32_t pulselen;
+typedef enum
+{
+    STATE_OFF,
+    STATE_GOTO_ON,
+    STATE_ON,
+    STATE_GOTO_OFF
+} state_t;
+
+extern volatile uint32_t    pulselen;
+extern volatile bool        enabled;
+extern volatile state_t     state;
 
 #endif //__GLOBALS_H

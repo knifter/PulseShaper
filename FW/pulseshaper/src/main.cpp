@@ -18,18 +18,10 @@ hw_timer_t * timer = NULL;
 
 void IRAM_ATTR ISR_trigger_rise()
 {
-    // uint32_t cnt = pulselen;
-    // while(cnt--)
-    // {
-    //     usleep(1);
-    // };
-    // digitalWrite(PIN_PORTAND, LOW);
-
     // High: Start timer
     timerStart(timer);
 
     // Next is falling
-    // detachInterrupt(PIN_TRIGGER);
     usleep(1);
     attachInterrupt(PIN_TRIGGER, ISR_trigger_fall, FALLING);
 };
@@ -39,21 +31,21 @@ void IRAM_ATTR ISR_trigger_fall()
     timerStop(timer);
 
     // re-enable AND-gate
-    digitalWrite(PIN_PORTAND, HIGH);
+    gpio_set_level(PIN_PORTAND, HIGH);
+
+    // reset timer for next round
+    timerWrite(timer, 0);
 
     // Next is rising
-    // detachInterrupt(PIN_TRIGGER);
     usleep(1);
     attachInterrupt(PIN_TRIGGER, ISR_trigger_rise, RISING);
 };
 
 void IRAM_ATTR ISR_timer()
 {
-    // digitalWrite(PIN_PORTAND, HIGH);
-    digitalWrite(PIN_PORTAND, LOW);
+    gpio_set_level(PIN_PORTAND, LOW);
 
     timerStop(timer);
-    // timerAlarmDisable(timer);
 };
 
 void setup()
@@ -61,40 +53,34 @@ void setup()
 	Serial.begin(115200);
 
     // Init IO
-	digitalWrite(PIN_SPEAKER, LOW);
-	pinMode(PIN_SPEAKER, OUTPUT);
+	gpio_set_level(PIN_SPEAKER, LOW);
+	gpio_set_direction(PIN_SPEAKER, GPIO_MODE_OUTPUT);
 	pinMode(PIN_BTN_A, INPUT_PULLUP);
 	pinMode(PIN_BTN_B, INPUT_PULLUP);
 	pinMode(PIN_BTN_C, INPUT_PULLUP);
     pinMode(PIN_TRIGGER, INPUT);
-    digitalWrite(PIN_PORTAND, HIGH);
+    pinMode(PIN_ENABLE, INPUT);
+    gpio_set_level(PIN_PORTAND, HIGH);
     pinMode(PIN_PORTAND, OUTPUT);
 
     // Hold on key-press
     while(scan_keys() == KEY_AB);
+
+    // Init globals
+    pulselen = PULSELEN_DEFAULT;
+    state = STATE_OFF;
 
     // Start up GUI
 	gui.begin();
 
     // Initialize sensors etc
     attachInterrupt(PIN_TRIGGER, ISR_trigger_rise, RISING);
-    // attachInterrupt(PIN_TRIGGER, ISR_trigger_fall, FALLING);
-
-    // const esp_timer_create_args_t oneshot_timer_args = 
-    // {
-    //     .callback = &ISR_timer,
-    //     /* argument specified here will be passed to timer callback function */
-    //     .arg = nullptr,
-    //     .name = "one-shot"
-    // };
-    // ESP_ERROR_CHECK(esp_timer_create(&oneshot_timer_args, &oneshot));
-    // ESP_ERROR_CHECK(esp_timer_start_once(oneshot, 5000000));
 
     timer = timerBegin(0, 80, true);
-    timerAttachInterrupt(timer, &ISR_timer, RISING);
+    timerAttachInterrupt(timer, &ISR_timer, false);
     timerStop(timer);
     timerAlarmWrite(timer, pulselen, true);
-    timerAlarmEnable(timer);
+    timerAlarmDisable(timer);
 
     // Bootstrap the GUI
     ScreenPtr scr = std::make_shared<BootScreen>(gui);
@@ -112,6 +98,19 @@ void loop()
     {
         timerAlarmWrite(timer, pulselen - PULSELEN_CORRECTION, true);
         prv_pulselen = pulselen;
+    };
+
+    int new_enabled = digitalRead(PIN_ENABLE);
+    if(new_enabled != enabled)
+    {
+        if(new_enabled == HIGH)
+        {
+            timerAlarmEnable(timer);
+            enabled = HIGH;
+        }else{
+            timerAlarmDisable(timer);
+            enabled = LOW;
+        };
     };
 
 	gui.handle(e);
